@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReactMad</title>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div class="game-container">
+        <h1>⚗️ ReactMad</h1>
+        <div id="timer">0.00s</div>
+        <div class="blob">Balance the reaction:</div>
+        
+        <div class="reaction-container">
+            <div class="reaction" id="reaction"></div>
+            <div class="blur-overlay" id="startOverlay" onclick="startGame()">
+                <div>
+                    <i data-lucide="play-circle"></i>
+                    Play
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
