@@ -1,29 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ReactMad</title>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-    <link rel="stylesheet" href="./style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="./style.css" />
+    <link rel="icon" href="./favicon.png" />
+    <meta property="og:title" content="ReactMad" />
+    <meta property="og:site_name" content="ReactMad" />
+    <meta property="og:url" content="https://react.alimad.co">
+    <meta
+      property="og:description"
+      content="Balance the chemical equations and make
+    your way up to the top of the leaderboard!!!"
+    />
+    <meta property="og:type" content="" />
+    <meta property="og:image" content=./og.png>
+  </head>
+  <body>
     <div class="game-container">
-        <h1>⚗️ ReactMad</h1>
-        <div id="timer">0.00s</div>
-        <div class="blob">Balance the reaction:</div>
-        
-        <div class="reaction-container">
-            <div class="reaction" id="reaction"></div>
-            <div class="blur-overlay" id="startOverlay" onclick="startGame()">
-                <div>
-                    <i data-lucide="play-circle"></i>
-                    Play
-                </div>
-            </div>
+      <h1>⚗️ ReactMad</h1>
+      <div id="timer">0.00s</div>
+      <div class="blob">Balance the reaction:</div>
+
+      <div class="reaction-container">
+        <div class="reaction" id="reaction"></div>
+        <div class="blur-overlay" id="startOverlay" onclick="startGame()">
+          <div>
+            <i data-lucide="play-circle"></i>
+            Play
+          </div>
         </div>
+      </div>
     </div>
 
     <script src="script.js"></script>
-</body>
+  </body>
 </html>
