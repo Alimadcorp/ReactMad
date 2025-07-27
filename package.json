@@ -1,0 +1,19 @@
+{
+  "name": "ReactMad",
+  "version": "1.0.1",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": ["game", "reaction", "chemistry", "game-jam", "melon-jam-6"],
+  "author": "Alimad Co",
+  "license": "ISC",
+  "description": "GWAHAHAHHAHAH",
+  "dependencies": {
+    "express": "^5.1.0",
+    "uuid": "^11.1.0",
+    "ws": "^8.18.3"
+  }
+}

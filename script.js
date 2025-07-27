@@ -2,21 +2,33 @@ lucide.createIcons();
 
 const _reactions = [
   "2H2+O2:2H2O",
-  "CH4+2O2:CO2+2H2O",
-  "2KClO3:2KCl+3O2",
-  "C3H8+5O2:3CO2+4H2O",
-  "2Na+Cl2:2NaCl",
-  "CaCO3:CaO+CO2",
-  "2Al+3Cl2:2AlCl3",
-  "Zn+2HCl:ZnCl2+H2",
-  "Fe2O3+3H2:2Fe+3H2O",
-  "2NH3+3CuO:3Cu+N2+3H2O",
-  "4Fe+3O2:2Fe2O3",
-  "2C2H6+7O2:4CO2+6H2O",
-  "Ca+2H2O:Ca(OH)2+H2",
-  "2AgNO3+CaCl2:2AgCl+Ca(NO3)2",
   "N2+3H2:2NH3",
+  "2Na+Cl2:2NaCl",
+  "4Fe+3O2:2Fe2O3",
+  "2KClO3:2KCl+3O2",
+  "2Al+3Cl2:2AlCl3",
+  "CH4+2O2:CO2+2H2O",
+  "Fe2O3+3H2:2Fe+3H2O",
+  "Ca+2H2O:Ca(OH)2+H2",
+  "2C2H6+7O2:4CO2+6H2O",
+  "2NH3+3CuO:3Cu+N2+3H2O",
+  "2AgNO3+CaCl2:2AgCl+Ca(NO3)2",
+  "Fe+CuSO4:FeSO4+Cu",
+  "Pb(NO3)2+2KI:PbI2+2KNO3",
+  "C6H12O6+6O2:6CO2+6H2O",
+  "HCl+NaOH:NaCl+H2O",
+  "Zn+2HCl:ZnCl2+H2",
+  "C3H8+5O2:3CO2+4H2O",
+  "Na2CO3+2HCl:2NaCl+H2O+CO2",
+  "2NaHCO3:Na2CO3+H2O+CO2",
+  "CaCO3+2HCl:CaCl2+H2O+CO2",
+  "C2H5OH+3O2:2CO2+3H2O",
+  "Al2(SO4)3+6NaOH:2Al(OH)3+3Na2SO4",
+  "3Mg+N2:Mg3N2",
+  "2C4H10+13O2:8CO2+10H2O"
 ];
+
+const scoreDiv = document.getElementById("score");
 
 function parseReactions(r) {
   return r.map((entry) => {
@@ -48,21 +60,29 @@ let currentReaction,
 const reactionDiv = document.getElementById("reaction");
 const timerDiv = document.getElementById("timer");
 const overlay = document.getElementById("startOverlay");
+let timeLeft = 20;
+let score = parseInt(localStorage.getItem("reaction_score")) || 0;
+let scoreLerp = 0;
+let index = localStorage.getItem("reaction_index") || 0; //next reaction to show
 
 function toSubscript(text) {
   return text.replace(/(\d+)/g, "<sub>$1</sub>");
 }
 
 function loadNewReaction() {
-  currentReaction = reactions[Math.floor(Math.random() * reactions.length)];
+  currentReaction = reactions[index];
   coeffs = Array(
     currentReaction.reactants.length + currentReaction.products.length
   ).fill(1);
   renderReaction();
+  reactionDiv.style.display = "flex";
+  setBar("bar2", ((parseInt(index) + 1) / reactions.length) * 100);
 }
 
+const srdihtml = reactionDiv.innerHTML;
+
 function renderReaction() {
-  reactionDiv.innerHTML = "";
+  reactionDiv.innerHTML = srdihtml;
   const full = [...currentReaction.reactants, "→", ...currentReaction.products];
 
   full.forEach((item, i) => {
@@ -140,10 +160,19 @@ function renderReaction() {
   });
 }
 
+setInterval(() => {
+  scoreLerp = Math.ceil(lerp(scoreLerp, score, 0.2));
+  scoreDiv.textContent = `Score: ${scoreLerp}`;
+}, 20);
+
 function checkBalance() {
   const correct = coeffs.every((val, i) => val === currentReaction.solution[i]);
   if (correct) {
     clearInterval(interval);
+    score += timeLeft * 100;
+    localStorage.setItem("reaction_score", score);
+    index++;
+    localStorage.setItem("reaction_index", index);
     reactionDiv.classList.add("success-animation", "balanced-reaction");
     timerDiv.textContent = `Balanced in ${timer.toFixed(2)}s`;
     timerDiv.style.background = "rgba(100, 255, 218, 0.2)";
@@ -160,11 +189,7 @@ function checkBalance() {
         reactionDiv.classList.remove("success-animation", "balanced-reaction");
         timerDiv.style.background = "rgba(100, 255, 218, 0.1)";
         timerDiv.style.borderColor = "rgba(100, 255, 218, 0.3)";
-        timer = 0;
-        interval = setInterval(() => {
-          timer += 0.01;
-          timerDiv.textContent = `Time: ${timer.toFixed(2)}s`;
-        }, 10);
+        resetInterval();
         lucide.createIcons();
       };
       lucide.createIcons();
@@ -175,10 +200,39 @@ function checkBalance() {
 function startGame() {
   overlay.classList.add("hidden");
   loadNewReaction();
+  resetInterval();
+}
+
+function resetInterval() {
+  timeLeft = index < 3 ? 25 : 20;
   timer = 0;
   interval = setInterval(() => {
+    timeLeft -= 0.01;
+    let perc = timeLeft / (index < 3 ? 25 : 20);
+    setBar("bar1", perc * 100);
+    if (timeLeft < 0) {
+      timeLeft = 0;
+      timer += 0.01;
+      timerDiv.textContent = `Time Over`;
+      timerDiv.style.backgroundColor = "#f009";
+      setTimeout(() => {
+        overlay.innerHTML =
+          '<div><i data-lucide="rotate-ccw"></i> Restart</div>';
+        index = 0;
+        localStorage.setItem("reaction_index", 0);
+        score = 0;
+        localStorage.setItem("reaction_score", 0);
+        overlay.classList.remove("hidden");
+        overlay.onclick = () => {
+          location.reload();
+          lucide.createIcons();
+        };
+        lucide.createIcons();
+      }, 1500);
+      return;
+    }
     timer += 0.01;
-    timerDiv.textContent = `${timer.toFixed(2)}s`;
+    timerDiv.textContent = `${timeLeft.toFixed(2)}s left`;
   }, 10);
 }
 
@@ -190,6 +244,39 @@ document.addEventListener("keydown", (e) => {
     checkBalance();
   }
 });
+
 document.addEventListener("DOMContentLoaded", () => {
   lucide.createIcons();
 });
+
+function setBar(barId, percent) {
+  if (percent <= 0) return;
+  document.getElementById(`${barId}-fill`).style.width = percent + "%";
+}
+
+function custom_prompt(message, callback) {
+  const overlay = document.getElementById("customPromptOverlay");
+  const label = document.getElementById("customPromptLabel");
+  const input = document.getElementById("customPromptInput");
+  const submit = document.getElementById("customPromptSubmit");
+
+  label.textContent = message;
+  input.value = "";
+  overlay.classList.remove("hidden");
+  input.focus();
+
+  const handleSubmit = () => {
+    if(input.value.trim().length <= 0) return;
+    overlay.classList.add("hidden");
+    callback(input.value);
+    submit.removeEventListener("click", handleSubmit);
+    input.removeEventListener("keydown", handleKeydown);
+  };
+
+  const handleKeydown = (e) => {
+    if (e.key === "Enter") handleSubmit();
+  };
+
+  submit.addEventListener("click", handleSubmit);
+  input.addEventListener("keydown", handleKeydown);
+}

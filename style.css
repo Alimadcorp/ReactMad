@@ -2,10 +2,14 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Phantom Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: #000;
   color: #fff;
   min-height: 100vh;
@@ -14,16 +18,24 @@ body {
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  overflow-x: auto;
+  overflow: hidden;
+  padding: 0;
+  margin: 0;
 }
 
 .game-container {
+  position: absolute;
   width: 100%;
   max-width: 1200px;
   display: flex;
+  margin: 0;
   flex-direction: column;
   align-items: center;
   gap: 1rem;
+}
+
+.bg{
+  margin: 0;
 }
 
 h1 {
@@ -49,6 +61,18 @@ h1 {
   transition: all 0.3s ease;
 }
 
+#score {
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  font-weight: 560;
+  color: #64d0ff;
+  background: rgba(100, 237, 255, 0.1);
+  padding: 0.7rem 1rem;
+  border-radius: 50px;
+  border: 2px solid rgba(100, 196, 255, 0.3);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
 .blob {
   font-size: clamp(1rem, 2.5vw, 1.4rem);
   font-weight: 600;
@@ -60,12 +84,66 @@ h1 {
 }
 
 .reaction-container {
-  position: relative;
   width: 100%;
+  padding: 0;
   display: flex;
   justify-content: center;
   min-height: 120px;
   align-items: center;
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+}
+
+
+.reaction-bars {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.progress-line {
+  position: relative;
+  height: 8px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  font-size: 0.6rem;
+  color: #fff;
+  overflow: hidden;
+}
+
+.bar-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  opacity: 1;
+  z-index: 1;
+}
+
+.bar-left,
+.bar-right {
+  position: relative;
+  z-index: 2;
+  padding: 0 4px;
+  white-space: nowrap;
+}
+
+.bar-left {
+  flex: 1;
+}
+
+.bar-right {
+  flex-shrink: 0;
 }
 
 .reaction {
@@ -81,7 +159,7 @@ h1 {
   background: #fff1;
   border-radius: 20px;
   border: 1px solid #fff2;
-  backdrop-filter: blur(20px);
+  backdrop-filter: blur(10px);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
@@ -94,7 +172,7 @@ h1 {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(100, 255, 218, 0.1), transparent);
+  background: #fff1;
   transition: left 0.5s ease;
 }
 
@@ -193,8 +271,8 @@ h1 {
   width: 100%;
   height: 100%;
   padding: 0;
-  backdrop-filter: blur(15px);
-  background: rgba(15, 15, 35, 0.8);
+  backdrop-filter: blur(10px);
+  background: rgba(15, 15, 35, 0.9);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -211,13 +289,13 @@ h1 {
 
 .blur-overlay.hidden {
   backdrop-filter: blur(0px);
-  background: rgba(15, 15, 35, 0);
+  background: rgba(15, 15, 35, 0.1);
   pointer-events: none;
   opacity: 0;
 }
 
 .blur-overlay:hover {
-  background: rgba(15, 15, 35, 0.9);
+  background: rgba(15, 15, 35, 0.4);
   text-shadow: 0 2px 15px rgba(100, 255, 218, 0.8);
 }
 

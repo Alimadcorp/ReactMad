@@ -4,12 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ReactMad</title>
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/hackclub/css@c5cf9c989b8cb3d3f2e15830c0f3b3e8fb42e6eb/fonts.css"
+    />
+    <!--<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/p5@2.0.3/lib/p5.min.js"></script>-->
+    <script src="lucide.js"></script>
+    <script src="p5.min.js"></script>
     <link rel="stylesheet" href="./style.css" />
     <link rel="icon" href="./favicon.png" />
     <meta property="og:title" content="ReactMad" />
     <meta property="og:site_name" content="ReactMad" />
-    <meta property="og:url" content="https://react.alimad.co">
+    <meta property="og:url" content="https://react.alimad.co" />
     <meta
       property="og:description"
       content="Balance the chemical equations and make
@@ -19,22 +26,115 @@
     <meta property="og:image" content=./og.png>
   </head>
   <body>
+    <h1 style="display: none">I M SO GOOD AT THIS GAME AAAAAAAAHHHHHHHHH</h1>
+    <main class="bg"></main>
     <div class="game-container">
       <h1>⚗️ ReactMad</h1>
-      <div id="timer">0.00s</div>
+      <div id="timer">Mode: Time attack</div>
+      <div id="score">Score: 0</div>
       <div class="blob">Balance the reaction:</div>
 
       <div class="reaction-container">
-        <div class="reaction" id="reaction"></div>
+        <div class="reaction" id="reaction" style="display: none"></div>
         <div class="blur-overlay" id="startOverlay" onclick="startGame()">
           <div>
             <i data-lucide="play-circle"></i>
             Play
           </div>
         </div>
+        <div class="reaction-bars">
+          <div class="progress-line">
+            <div
+              class="bar-fill"
+              id="bar1-fill"
+              style="background: rgb(0, 242, 81)"
+            ></div>
+          </div>
+          <div class="progress-line">
+            <div
+              class="bar-fill"
+              id="bar2-fill"
+              style="
+                background: rgb(0, 155, 239);
+                transition: width 1s ease-in-out;
+              "
+            ></div>
+          </div>
+        </div>
       </div>
     </div>
+    <div id="customPromptOverlay" class="blur-overlay hidden">
+      <div
+        style="
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
+          background: rgba(0, 0, 0, 0.6);
+          padding: 2rem;
+          border-radius: 20px;
+          border: 2px solid rgba(100, 255, 218, 0.2);
+          backdrop-filter: blur(20px);
+          color: #64f2ff;
+          box-shadow: 0 0 30px rgba(100, 255, 218, 0.1);
+        "
+      >
+        <label
+          id="customPromptLabel"
+          style="font-size: 1.4rem; text-align: center"
+        ></label>
+        <input
+          id="customPromptInput"
+          type="text"
+          style="
+            padding: 0.6rem 1.2rem;
+            font-size: 1.2rem;
+            border-radius: 12px;
+            border: 2px solid rgba(100, 255, 218, 0.3);
+            background: rgba(0, 0, 0, 0.2);
+            color: #fff;
+            width: 100%;
+            max-width: 300px;
+            outline: none;
+          "
+        />
+        <button
+          id="customPromptSubmit"
+          style="
+            margin-top: 1rem;
+            padding: 0.6rem 1.2rem;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #000;
+            background: #64ffda;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+          "
+        >
+          OK
+        </button>
+      </div>
+    </div>
+    <div
+      id="leaderboard"
+      style="
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        background: rgba(0, 0, 0, 0.6);
+        color: white;
+        font-size: 14px;
+        padding: 10px;
+        border-radius: 8px;
+        max-width: 250px;
+        pointer-events: none;
+        z-index: 9999;
+      "
+    ></div>
 
     <script src="script.js"></script>
+    <script src="client.js"></script>
   </body>
 </html>
