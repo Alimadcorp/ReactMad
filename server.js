@@ -11,7 +11,7 @@ const server = app.listen(PORT, () =>
 );
 
 const wss = new WebSocketServer({ server });
-const clients = new Map(); // ws => { id, username, score, index, offline }
+const clients = new Map();
 
 function broadcast(type, payload, excludeWs = null) {
   const message = JSON.stringify({ type, ...payload });
@@ -23,13 +23,15 @@ function broadcast(type, payload, excludeWs = null) {
 }
 
 function getCurrentLeaderboard() {
-  return [...clients.values()].map(({ id, username, score, index, offline }) => ({
-    id,
-    username,
-    score,
-    index,
-    offline: !!offline,
-  }));
+  return [...clients.values()].map(
+    ({ id, username, score, index, offline }) => ({
+      id,
+      username,
+      score,
+      index,
+      offline: !!offline,
+    })
+  );
 }
 
 wss.on("connection", (ws) => {
@@ -45,10 +47,27 @@ wss.on("connection", (ws) => {
   clients.set(ws, clientData);
   ws.send(JSON.stringify({ type: "init", id }));
 
-  ws.send(JSON.stringify({
-    type: "leaderboard",
-    users: getCurrentLeaderboard(),
-  }));
+  for (const [otherWs, otherData] of clients.entries()) {
+    if (otherWs !== ws) {
+      ws.send(
+        JSON.stringify({
+          type: "update",
+          id: otherData.id,
+          username: otherData.username,
+          score: otherData.score,
+          index: otherData.index,
+          offline: !clients.has(otherWs),
+        })
+      );
+    }
+  }
+
+  ws.send(
+    JSON.stringify({
+      type: "leaderboard",
+      users: getCurrentLeaderboard(),
+    })
+  );
 
   ws.on("message", (raw) => {
     let msg;
@@ -63,13 +82,37 @@ wss.on("connection", (ws) => {
     if (!data) return;
 
     if (msg.type === "set-username") {
-      const taken = [...clients.values()].some(
-        (c) => c.username === msg.username && c.id !== data.id
-      );
-      if (taken) {
-        ws.send(JSON.stringify({ type: "error", message: "Username taken" }));
-        return;
+      for (const [clientWs, clientData] of clients.entries()) {
+        if (clientData.username === msg.username && clientWs !== ws) {
+          clients.delete(clientWs);
+          try {
+            clientWs.close();
+          } catch (e) {}
+          broadcast("update", {
+            id: data.id,
+            username: data.username,
+            score: data.score,
+            index: data.index,
+            offline: data.offline,
+          });
+          for (const [clientWs, clientData] of clients.entries()) {
+            if (clientWs !== ws && clientData.offline) {
+              ws.send(
+                JSON.stringify({
+                  type: "update",
+                  id: clientData.id,
+                  username: clientData.username,
+                  score: clientData.score,
+                  index: clientData.index,
+                  offline: true,
+                })
+              );
+            }
+          }
+          break;
+        }
       }
+
       data.username = msg.username;
       broadcast("update", {
         id: data.id,
@@ -102,12 +145,21 @@ wss.on("connection", (ws) => {
     if (!data) return;
 
     data.offline = true;
-    broadcast("update", {
+    clients.set(ws, data);
+
+    const leaveMsg = JSON.stringify({
+      type: "update",
       id: data.id,
       username: data.username,
       score: data.score,
       index: data.index,
       offline: true,
     });
+
+    for (const client of clients.keys()) {
+      if (client.readyState === 1) {
+        client.send(leaveMsg);
+      }
+    }
   });
 });

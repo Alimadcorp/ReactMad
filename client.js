@@ -1,10 +1,15 @@
+const url =
+  window.location.href.includes("127.0.0.1") ||
+  window.location.href.includes("localhost")
+    ? "ws://localhost:4568"
+    : "wss://1f6b959d28e1.ngrok-free.app";
 let trail = [];
 let leaderboard = [];
 let socket;
 let myId = null;
 let myUsername = localStorage.getItem("r.myusername");
 let others = {};
-let trails = {}; // playerId => [Vector, ...]
+let trails = {};
 
 function setup() {
   createCanvas(windowWidth, windowHeight, P2D);
@@ -58,7 +63,9 @@ function drawLb() {
         ${isMe ? "color:#0ff;font-weight:bold;" : ""}
         ${p.offline ? "opacity:0.5;font-style:italic;" : ""}
       `.trim();
-      return `<div style="${style}">${i + 1}. ${p.username} — Score: ${p.score} — Lv.${p.index}</div>`;
+      return `<div style="${style}">${i + 1}. ${p.username} — Score: ${
+        p.score
+      } — Lv.${p.index}</div>`;
     })
     .join("");
 }
@@ -83,12 +90,6 @@ function windowResized() {
 }
 
 function startSocket() {
-  const url =
-    window.location.href.includes("127.0.0.1") ||
-    window.location.href.includes("localhost")
-      ? "ws://localhost:4568"
-      : "wss://1f6b959d28e1.ngrok-free.app";
-
   socket = new WebSocket(url);
 
   socket.addEventListener("open", () => {
@@ -145,7 +146,7 @@ function updateLeaderboard(msg) {
       offline: !!msg.offline,
     });
   } else {
-    player.score = msg.score;
+    player.score = Math.ceil(msg.score);
     player.index = msg.index;
     player.offline = !!msg.offline;
   }
@@ -170,7 +171,7 @@ function drawOtherPlayers() {
 
     const smoothTrail = chaikin(trail, 2);
     for (let i = 0; i < smoothTrail.length - 1; i++) {
-      stroke(0, 0, 100, 255);
+      stroke(player.offline ? color(0, 0, 80, 10) : color(0, 0, 100, 255));
       strokeWeight(map(i, 0, smoothTrail.length - 1, 1, 8));
       line(
         smoothTrail[i].x,
