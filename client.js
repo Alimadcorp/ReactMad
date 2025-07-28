@@ -127,12 +127,7 @@ function startSocket() {
 
       updateLeaderboard(msg);
     } else if (msg.type === "leaderboard") {
-      leaderboard = msg.users.map((user) => ({
-        username: user.username,
-        score: Math.ceil(user.score),
-        index: user.index,
-        offline: !!user.offline,
-      }));
+      others = msg.users;
     }
   });
 
@@ -156,7 +151,7 @@ function startSocket() {
       );
     }
     lastState = state;
-  }, 40);
+  }, 50);
 }
 
 function updateLeaderboard(msg) {
