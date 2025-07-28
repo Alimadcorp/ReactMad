@@ -123,6 +123,13 @@ function startSocket() {
           others[msg.username].tx = msg.x;
           others[msg.username].ty = msg.y;
         }
+      } else if (msg.type === "leaderboard") {
+        leaderboard = msg.users.map((user) => ({
+          username: user.username,
+          score: Math.ceil(user.score),
+          index: user.index,
+          offline: !!user.offline,
+        }));
       }
 
       updateLeaderboard(msg);
@@ -131,10 +138,11 @@ function startSocket() {
 
   setInterval(() => {
     let state = { x: mouseX, y: mouseY, score, index: parseInt(index) || 0 };
-    const changed = state.x !== lastState.x ||
-    state.y !== lastState.y ||
-    state.score !== lastState.score ||
-    state.index !== lastState.index;
+    const changed =
+      state.x !== lastState.x ||
+      state.y !== lastState.y ||
+      state.score !== lastState.score ||
+      state.index !== lastState.index;
     if (socket && socket.readyState === WebSocket.OPEN && changed) {
       socket.send(
         JSON.stringify({
