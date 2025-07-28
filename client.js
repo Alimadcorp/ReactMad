@@ -123,16 +123,16 @@ function startSocket() {
           others[msg.username].tx = msg.x;
           others[msg.username].ty = msg.y;
         }
-      } else if (msg.type === "leaderboard") {
-        leaderboard = msg.users.map((user) => ({
-          username: user.username,
-          score: Math.ceil(user.score),
-          index: user.index,
-          offline: !!user.offline,
-        }));
       }
 
       updateLeaderboard(msg);
+    } else if (msg.type === "leaderboard") {
+      leaderboard = msg.users.map((user) => ({
+        username: user.username,
+        score: Math.ceil(user.score),
+        index: user.index,
+        offline: !!user.offline,
+      }));
     }
   });
 
