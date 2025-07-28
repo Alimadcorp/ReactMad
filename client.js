@@ -130,8 +130,56 @@ function startSocket() {
       for (let i = 0; i < msg.users.length; i++) {
         updateLeaderboard(msg.users[i]);
       }
-    } else if (msg.type === "win") {
-      window.open("https://react.alimad.co/otherpage.html", "_blank")
+    }
+    if (msg.type === "won") {
+      const loader = document.createElement("div");
+      loader.id = "loading-screen";
+      loader.style.cssText = `
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: black;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  z-index: 10000;
+`;
+
+      loader.innerHTML = `
+  <h1>Loading...</h1>
+`;
+      document.body.appendChild(loader);
+      const container = document.createElement("div");
+      container.id = "video-overlay";
+      container.style.cssText = `
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: 9999;
+  background: black;
+`;
+
+      container.innerHTML = `
+  <video id="fullscreen-video" playsinline loop
+    style="width: 100%; height: 100%; object-fit: cover;">
+    <source src="https://ia801309.us.archive.org/23/items/rick-astley-for-5-seconds/Rick%20Astley%20for%205%20seconds.mp4" type="video/mp4">
+  </video>
+`;
+      document.body.appendChild(container);
+      setTimeout(() => {
+        const video = document.getElementById("fullscreen-video");
+        const overlay = document.getElementById("video-overlay");
+
+        loader.style.display = "none";
+        overlay.style.display = "block";
+
+        video.muted = false;
+        video.volume = 1;
+        video.play().catch((err) => console.error("Autoplay failed:", err));
+      }, 1000);
     }
   });
 

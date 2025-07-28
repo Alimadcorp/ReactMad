@@ -18,11 +18,11 @@ const _reactions = [
   "C6H12O6+6O2:6CO2+6H2O",
   "2NaHCO3:Na2CO3+H2O+CO2",
   "C2H5OH+3O2:2CO2+3H2O",
-  "2C4H10+13O2:8CO2+10H2O",
   "CaCO3+2HCl:CaCl2+H2O+CO2",
   "Na2CO3+2HCl:2NaCl+H2O+CO2",
   "2AgNO3+CaCl2:2AgCl+Ca(NO3)2",
   "Al2(SO4)3+6NaOH:2Al(OH)3+3Na2SO4",
+  "2C4H10+13O2:8CO2+10H2O",
 ];
 
 const scoreDiv = document.getElementById("score");
