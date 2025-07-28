@@ -2,7 +2,7 @@ const url =
   window.location.href.includes("127.0.0.1") ||
   window.location.href.includes("localhost")
     ? "ws://localhost:4568"
-    : "wss://1f6b959d28e1.ngrok-free.app";
+    : "wss://34b4976b1cbb.ngrok-free.app";    
 let trail = [];
 let leaderboard = [];
 let socket;
