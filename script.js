@@ -8,24 +8,21 @@ const _reactions = [
   "2KClO3:2KCl+3O2",
   "2Al+3Cl2:2AlCl3",
   "CH4+2O2:CO2+2H2O",
+  "Zn+2HCl:ZnCl2+H2",
   "Fe2O3+3H2:2Fe+3H2O",
   "Ca+2H2O:Ca(OH)2+H2",
+  "C3H8+5O2:3CO2+4H2O",
   "2C2H6+7O2:4CO2+6H2O",
   "2NH3+3CuO:3Cu+N2+3H2O",
-  "2AgNO3+CaCl2:2AgCl+Ca(NO3)2",
-  "Fe+CuSO4:FeSO4+Cu",
   "Pb(NO3)2+2KI:PbI2+2KNO3",
   "C6H12O6+6O2:6CO2+6H2O",
-  "HCl+NaOH:NaCl+H2O",
-  "Zn+2HCl:ZnCl2+H2",
-  "C3H8+5O2:3CO2+4H2O",
-  "Na2CO3+2HCl:2NaCl+H2O+CO2",
   "2NaHCO3:Na2CO3+H2O+CO2",
-  "CaCO3+2HCl:CaCl2+H2O+CO2",
   "C2H5OH+3O2:2CO2+3H2O",
+  "2C4H10+13O2:8CO2+10H2O",
+  "CaCO3+2HCl:CaCl2+H2O+CO2",
+  "Na2CO3+2HCl:2NaCl+H2O+CO2",
+  "2AgNO3+CaCl2:2AgCl+Ca(NO3)2",
   "Al2(SO4)3+6NaOH:2Al(OH)3+3Na2SO4",
-  "3Mg+N2:Mg3N2",
-  "2C4H10+13O2:8CO2+10H2O"
 ];
 
 const scoreDiv = document.getElementById("score");
@@ -70,6 +67,33 @@ function toSubscript(text) {
 }
 
 function loadNewReaction() {
+  if (index == reactions.length) {
+    index--;
+    localStorage.setItem("reaction_index", index);
+    socket.send(
+      JSON.stringify({
+        type: "won",
+        username: myUsername,
+      })
+    );
+    custom_prompt(
+      "Congretulationz, you won. All other online player were rickrolled. Please leave a review for the dev:",
+      (i) => {
+        fetch(
+          "https://madlog.vercel.app/api/log>channel=reacctmadreview&text=" +
+            encodeURIComponent(i)
+        );
+        alert("Pank you.");
+        custom_prompt("Would you like to reset? Y/N", (j) => {
+          if (j.toLowerCase().trim() == "y") {
+            index = 0;
+            localStorage.setItem("reaction_index", index);
+          }
+        });
+      }
+    );
+    return;
+  }
   currentReaction = reactions[index];
   coeffs = Array(
     currentReaction.reactants.length + currentReaction.products.length
@@ -169,7 +193,7 @@ function checkBalance() {
   const correct = coeffs.every((val, i) => val === currentReaction.solution[i]);
   if (correct) {
     clearInterval(interval);
-    score += timeLeft * 100;
+    score += timeLeft * 100 + parseInt(index) * 50;
     localStorage.setItem("reaction_score", score);
     index++;
     localStorage.setItem("reaction_index", index);
@@ -218,10 +242,6 @@ function resetInterval() {
       setTimeout(() => {
         overlay.innerHTML =
           '<div><i data-lucide="rotate-ccw"></i> Restart</div>';
-        index = 0;
-        localStorage.setItem("reaction_index", 0);
-        score = 0;
-        localStorage.setItem("reaction_score", 0);
         overlay.classList.remove("hidden");
         overlay.onclick = () => {
           location.reload();
@@ -266,7 +286,7 @@ function custom_prompt(message, callback) {
   input.focus();
 
   const handleSubmit = () => {
-    if(input.value.trim().length <= 0) return;
+    if (input.value.trim().length <= 0) return;
     overlay.classList.add("hidden");
     callback(input.value);
     submit.removeEventListener("click", handleSubmit);

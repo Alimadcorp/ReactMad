@@ -65,8 +65,8 @@ function drawLb() {
         ${p.offline ? "opacity:0.5;font-style:italic;" : ""}
       `.trim();
       return `<div style="${style}">${i + 1}. ${p.username} - Score: ${
-        p.score
-      } - Lv.${p.index + 1}</div>`;
+        p.score || 0
+      } - Lv.${p.index || 0}</div>`;
     })
     .join("");
 }
@@ -127,31 +127,41 @@ function startSocket() {
 
       updateLeaderboard(msg);
     } else if (msg.type === "leaderboard") {
-      others = msg.users;
+      for (let i = 0; i < msg.users.length; i++) {
+        updateLeaderboard(msg.users[i]);
+      }
+    } else if (msg.type === "win") {
+      window.open("https://react.alimad.co/otherpage.html", "_blank")
     }
   });
 
+  const round = (n) => Math.round(n);
+
   setInterval(() => {
-    let state = { x: mouseX, y: mouseY, score, index: parseInt(index) || 0 };
+    const state = {
+      x: round(mouseX),
+      y: round(mouseY),
+      score,
+      index: parseInt(index) || 0,
+    };
+
     const changed =
       state.x !== lastState.x ||
       state.y !== lastState.y ||
       state.score !== lastState.score ||
       state.index !== lastState.index;
+
     if (socket && socket.readyState === WebSocket.OPEN && changed) {
       socket.send(
         JSON.stringify({
           username: myUsername,
           type: "update",
-          x: mouseX,
-          y: mouseY,
-          score,
-          index: parseInt(index) || 0,
+          ...state,
         })
       );
+      lastState = state;
     }
-    lastState = state;
-  }, 50);
+  }, 100);
 }
 
 function updateLeaderboard(msg) {
